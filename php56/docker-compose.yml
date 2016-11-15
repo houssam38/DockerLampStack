@@ -1,0 +1,40 @@
+lamp:
+  build: .
+  ports :
+   - "80:80"
+   - "443:443"
+  volumes:
+    # Config Apache
+   #- ./config/apache/:/etc/apache2/
+   - /etc/ssl/:/etc/ssl/
+    # Set your folder here Your:Server
+   - /var/www/html/:/var/www/html/
+  links:
+   - database:mysql
+phpmyadmin:
+   image: phpmyadmin/phpmyadmin
+   ports :
+    - "8080:80"
+   environment:
+    - MYSQL_USERNAME=root
+    - MYSQL_PASSWORD=password
+    - PMA_HOST=mysql
+    - PMA_PORT=3306
+   links:
+    - database:mysql
+database:
+  image: mysql:5.6
+  ports:
+   - "3306:3306"
+  volumes:
+   #Store Mysql data
+   - ./data/mysql/:/var/lib/mysql
+   # Init database on first startup
+   - ./init/mysql/:/docker-entrypoint-initdb.d
+   # Config files
+   - ./config/mysql/:/etc/mysql/conf.d/
+  environment:
+     - MYSQL_ROOT_PASSWORD=password
+     - MYSQL_USER=houssam
+     - MYSQL_PASSWORD=houssam
+     - MYSQL_DATABASE=site
